@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anonymous Post Board</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        .post {
+            background-color: white;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .thumbs {
+            display: inline-block;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Anonymous Post Board</h1>
+
+    <!-- Form for sending posts -->
+    <form id="postForm">
+        <textarea id="postContent" rows="4" cols="50" placeholder="Write your post..." required></textarea><br>
+        <button type="submit">Post</button>
+    </form>
+
+    <!-- Displaying posts -->
+    <div id="postContainer"></div>
+
+    <script>
+        const posts = [];
+
+        function renderPosts() {
+            const postContainer = document.getElementById("postContainer");
+            postContainer.innerHTML = "";
+
+            posts.sort((a, b) => b.thumbsUp - a.thumbsUp);
+
+            posts.forEach(post => {
+                const postElement = document.createElement("div");
+                postElement.classList.add("post");
+                postElement.innerHTML = `<p>${post.content}</p><span class="thumbs" onclick="thumbsUp(${post.id})">👍 ${post.thumbsUp}</span><span class="thumbs" onclick="thumbsDown(${post.id})">👎 ${post.thumbsDown}</span>`;
+                postContainer.appendChild(postElement);
+            });
+        }
+
+        function addPost(content) {
+            const newPost = {
+                id: Date.now(),
+                content: content,
+                thumbsUp: 0,
+                thumbsDown: 0
+            };
+            posts.push(newPost);
+            renderPosts();
+        }
+
+        function thumbsUp(id) {
+            const post = posts.find(post => post.id === id);
+            if (post) {
+                post.thumbsUp++;
+                renderPosts();
+            }
+        }
+
+        function thumbsDown(id) {
+            const post = posts.find(post => post.id === id);
+            if (post) {
+                post.thumbsDown++;
+                renderPosts();
+            }
+        }
+
+        document.getElementById("postForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const postContent = document.getElementById("postContent").value.trim();
+            if (postContent !== "") {
+                addPost(postContent);
+                document.getElementById("postContent").value = "";
+            }
+        });
+    </script>
+</body>
+</html>
